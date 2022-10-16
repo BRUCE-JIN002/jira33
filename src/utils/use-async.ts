@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useReducer, useState } from "react";
 import { useMountedRef } from "./";
 
 interface State<D> {
@@ -17,34 +17,47 @@ const deafultConfig = {
   throwOnError: false,
 };
 
+const useSafeDispatch = <T>(dispatch: (...args: T[]) => void) => {
+  const mountedRef = useMountedRef();
+  return useCallback(
+    (...args: T[]) => {
+      mountedRef.current ? dispatch(...args) : void 0;
+    },
+    [dispatch, mountedRef]
+  );
+};
+
 export const useAsync = <D>(
   intialState?: State<D>,
   intialConfig?: typeof deafultConfig
 ) => {
   const config = { ...deafultConfig, ...intialConfig };
-  const [state, setState] = useState<State<D>>({
-    ...deafultInitialState,
-    ...intialState,
-  });
-  const mountedRef = useMountedRef();
+  const [state, dispatch] = useReducer(
+    (state: State<D>, action: Partial<State<D>>) => ({ ...state, ...action }),
+    {
+      ...deafultInitialState,
+      ...intialState,
+    }
+  );
+  const safeDispatch = useSafeDispatch(dispatch);
   const [retry, setRetry] = useState(() => () => {}); //惰性初始化
   const setData = useCallback(
     (data: D) =>
-      setState({
+      safeDispatch({
         data,
         stat: "success",
         error: null,
       }),
-    []
+    [safeDispatch]
   );
   const setError = useCallback(
     (error: Error) =>
-      setState({
+      safeDispatch({
         error,
         stat: "error",
         data: null,
       }),
-    []
+    [safeDispatch]
   );
 
   //run 用来触发异步请求
@@ -58,12 +71,10 @@ export const useAsync = <D>(
           run(runConfig.retry(), runConfig);
         }
       });
-      setState((prevState) => ({ ...prevState, stat: "loading" }));
+      safeDispatch({ stat: "loading" });
       return promise
         .then((data) => {
-          if (mountedRef) {
-            setData(data);
-          }
+          setData(data);
           return data;
         })
         .catch((error) => {
@@ -73,7 +84,7 @@ export const useAsync = <D>(
           return error;
         });
     },
-    [config.throwOnError, setData, setError, mountedRef]
+    [config.throwOnError, safeDispatch, setData, setError]
   );
 
   return {
