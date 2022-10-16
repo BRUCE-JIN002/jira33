@@ -1,6 +1,6 @@
 import React from "react";
 import { User } from "./search-panel";
-import { Button, Dropdown, Menu, Table } from "antd";
+import { Dropdown, Menu, Table } from "antd";
 import dayjs from "dayjs";
 import { TableProps } from "antd/es/table";
 import { Link } from "react-router-dom";
@@ -20,7 +20,7 @@ export interface Project {
 interface ListProps extends TableProps<Project> {
   users: User[];
   refresh?: () => void;
-  setProjectModalOpen: (isOpen: boolean) => void;
+  projectButton: JSX.Element;
 }
 
 export const List = ({ users, ...props }: ListProps) => {
@@ -80,22 +80,8 @@ export const List = ({ users, ...props }: ListProps) => {
               <Dropdown
                 overlay={
                   <Menu>
-                    <Menu.Item key={"edit"}>
-                      <ButtonNoPadding
-                        type={"link"}
-                        onClick={() => props.setProjectModalOpen(true)}
-                      >
-                        编辑
-                      </ButtonNoPadding>
-                    </Menu.Item>
-                    <Menu.Item key={"delete"}>
-                      <ButtonNoPadding
-                        type={"link"}
-                        onClick={() => props.setProjectModalOpen(true)}
-                      >
-                        删除
-                      </ButtonNoPadding>
-                    </Menu.Item>
+                    <Menu.Item key={"edit"}>{props.projectButton}</Menu.Item>
+                    <Menu.Item key={"delete"}>{props.projectButton}</Menu.Item>
                   </Menu>
                 }
               >

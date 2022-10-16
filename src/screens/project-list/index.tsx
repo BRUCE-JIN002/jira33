@@ -3,7 +3,7 @@ import { useDebounce, useDocumentTitle } from "../../utils";
 import { List } from "./list";
 import { SerachPanel } from "./search-panel";
 import styled from "@emotion/styled";
-import { Button, Typography } from "antd";
+import { Typography } from "antd";
 import { useProjects } from "../../utils/project";
 import { useUsers } from "../../utils/user";
 import { useProjectsSearchParams } from "./util";
@@ -11,9 +11,7 @@ import { Row } from "../../components/lib";
 
 export const apiUrl = process.env.REACT_APP_API_URL;
 
-export const ProjectListScreen = (props: {
-  setProjectModalOpen: (isOpen: boolean) => void;
-}) => {
+export const ProjectListScreen = (props: { projectButton: JSX.Element }) => {
   useDocumentTitle("项目列表", false);
   const [param, setParam] = useProjectsSearchParams();
   const {
@@ -27,12 +25,7 @@ export const ProjectListScreen = (props: {
     <Container>
       <Row between={true}>
         <h1>项目列表</h1>
-        <Button
-          type={"primary"}
-          onClick={() => props.setProjectModalOpen(true)}
-        >
-          创建项目
-        </Button>
+        {props.projectButton}
       </Row>
       <SerachPanel users={users || []} param={param} setParam={setParam} />
       {error ? (
@@ -43,7 +36,7 @@ export const ProjectListScreen = (props: {
         users={users || []}
         loading={isLoading}
         refresh={retry}
-        setProjectModalOpen={props.setProjectModalOpen}
+        projectButton={props.projectButton}
       />
     </Container>
   );
