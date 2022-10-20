@@ -3,11 +3,12 @@ import { useDebounce, useDocumentTitle } from "../../utils";
 import { List } from "./list";
 import { SerachPanel } from "./search-panel";
 import styled from "@emotion/styled";
-import { Typography } from "antd";
+import { Button } from "antd";
 import { useProjects } from "../../utils/project";
 import { useUsers } from "../../utils/user";
 import { useProjectModal, useProjectsSearchParams } from "./util";
-import { ButtonNoPadding, Row } from "../../components/lib";
+import { ErrorBox, Row } from "../../components/lib";
+import { PlusCircleOutlined } from "@ant-design/icons";
 
 export const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -15,31 +16,20 @@ export const ProjectListScreen = () => {
   useDocumentTitle("项目列表", false);
   const { open } = useProjectModal();
   const [param, setParam] = useProjectsSearchParams();
-  const {
-    isLoading,
-    error,
-    data: list,
-    retry,
-  } = useProjects(useDebounce(param, 200));
+  const { isLoading, error, data: list } = useProjects(useDebounce(param, 200));
   const { data: users } = useUsers();
   return (
     <Container>
       <Row between={true}>
         <h1>项目列表</h1>
-        <ButtonNoPadding type={"link"} onClick={open}>
+        <Button type={"primary"} onClick={open}>
+          <PlusCircleOutlined />
           创建项目
-        </ButtonNoPadding>
+        </Button>
       </Row>
       <SerachPanel users={users || []} param={param} setParam={setParam} />
-      {error ? (
-        <Typography.Text type={"danger"}>{error.message}</Typography.Text>
-      ) : null}
-      <List
-        dataSource={list || []}
-        users={users || []}
-        loading={isLoading}
-        refresh={retry}
-      />
+      <ErrorBox error={error} />
+      <List dataSource={list || []} users={users || []} loading={isLoading} />
     </Container>
   );
 };

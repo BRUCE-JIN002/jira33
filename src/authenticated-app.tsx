@@ -33,7 +33,7 @@ const PageHeader = () => {
       <HeaderLeft gap={true}>
         <ButtonNoPadding
           style={{ padding: 0 }}
-          type="link"
+          type={"link"}
           onClick={resetRoute}
         >
           <SoftwareLogo width={"18rem"} color={"rgb(38, 132, 255)"} />
