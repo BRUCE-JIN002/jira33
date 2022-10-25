@@ -5,7 +5,7 @@ import React, { useEffect } from "react";
 import { ErrorBox } from "../../components/lib";
 import { UserSelect } from "../../components/user-select";
 import { useAddProject, useEditProject } from "../../utils/project";
-import { useProjectModal } from "./util";
+import { useProjectModal, useProjectsQueryKey } from "./util";
 
 export const ProjectModal = () => {
   const { projectModalOpen, close, editingProject, isLoading } =
@@ -15,7 +15,11 @@ export const ProjectModal = () => {
   const title = editingProject ? "编辑项目" : "创建项目";
 
   const [form] = useForm();
-  const { mutateAsync, error, isLoading: mutateLoading } = useMutateProject();
+  const {
+    mutateAsync,
+    error,
+    isLoading: mutateLoading,
+  } = useMutateProject(useProjectsQueryKey());
   const onFinish = (values: any) => {
     mutateAsync({ ...editingProject, ...values }).then(() => {
       form.resetFields();
@@ -70,6 +74,7 @@ export const ProjectModal = () => {
               </Form.Item>
               <Form.Item style={{ textAlign: "center" }}>
                 <Button
+                  style={{ width: "100%" }}
                   loading={mutateLoading}
                   type={"primary"}
                   htmlType={"submit"}
