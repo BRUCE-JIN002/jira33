@@ -1,7 +1,8 @@
 import React, { ReactNode, useContext } from "react";
+import { useQueryClient } from "react-query";
 import * as auth from "../auth-Provider";
 import { FullPageErrorFallback, FullPageLoading } from "../components/lib";
-import { User } from "../screens/project-list/search-panel";
+import { User } from "../types/user";
 import { useMount } from "../utils";
 import { http } from "../utils/http";
 import { useAsync } from "../utils/use-async";
@@ -43,10 +44,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     isError,
     setData: setUser,
   } = useAsync<User | null>();
+  const queryClient = useQueryClient();
   //point free
   const login = (form: AuthForm) => auth.login(form).then(setUser);
   const register = (form: AuthForm) => auth.register(form).then(setUser);
-  const logout = () => auth.logout().then(() => setUser(null));
+  const logout = () =>
+    auth.logout().then(() => {
+      setUser(null);
+      queryClient.clear();
+    });
 
   useMount(() => {
     run(bootStrapUser());

@@ -29,6 +29,9 @@ export const ProjectModal = () => {
 
   useEffect(() => {
     form.setFieldsValue(editingProject);
+    return () => {
+      form.resetFields();
+    };
   }, [form, editingProject]);
 
   return (
@@ -52,6 +55,7 @@ export const ProjectModal = () => {
               onFinish={onFinish}
             >
               <Form.Item
+                key={"name"}
                 label={"名称"}
                 name={"name"}
                 rules={[{ required: true, message: "请输入项目名" }]}
@@ -59,6 +63,7 @@ export const ProjectModal = () => {
                 <Input placeholder={"请输入项目名"} />
               </Form.Item>
               <Form.Item
+                key={"organization"}
                 label={"部门"}
                 name={"organization"}
                 rules={[{ required: true, message: "请输入部门名" }]}
@@ -66,13 +71,14 @@ export const ProjectModal = () => {
                 <Input placeholder={"请输入部门名"} />
               </Form.Item>
               <Form.Item
+                key={"personId"}
                 label={"负责人"}
                 name={"personId"}
                 rules={[{ required: true, message: "请选择负责人" }]}
               >
                 <UserSelect defaultOptionName={"负责人"} />
               </Form.Item>
-              <Form.Item style={{ textAlign: "center" }}>
+              <Form.Item style={{ textAlign: "center" }} key={"submit"}>
                 <Button
                   style={{ width: "100%" }}
                   loading={mutateLoading}
